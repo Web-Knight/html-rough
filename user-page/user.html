@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPD Queuing System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input, select, button {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>OPD Queuing System</h1>
+    
+    <div class="grid">
+        <div class="card">
+            <div class="card-title">Real-time Queue Status</div>
+            <div class="status-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Patients in queue: <span id="queueLength">15</span></span>
+            </div>
+            <div class="status-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>Estimated wait time: <span id="waitTime">45</span> minutes</span>
+            </div>
+            <div class="status-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+                <span>Your appointment number: <span id="appointmentNumber">0</span></span>
+            </div>
+            <div id="queueStatus" class="status-item"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Schedule an Appointment</div>
+            <form id="appointmentForm">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter your name" required>
+                
+                <label for="date">Date</label>
+                <input type="date" id="date" required>
+                
+                <label for="time">Time</label>
+                <select id="time" required>
+                    <option value="">Select time</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                </select>
+                
+                <button type="submit">Schedule Appointment</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Upcoming Appointments</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentsTable">
+                <!-- Appointments will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let queueLength = 15;
+        let waitTime = 45;
+        let yourAppointmentNumber = 0;
+        let appointments = [
+            { id: 1, name: "John Doe", date: "2023-06-15", time: "10:00 AM" },
+            { id: 2, name: "Jane Smith", date: "2023-06-16", time: "2:30 PM" },
+        ];
+
+        function updateQueueStatus() {
+            document.getElementById('queueLength').textContent = queueLength;
+            document.getElementById('waitTime').textContent = waitTime;
+            document.getElementById('appointmentNumber').textContent = yourAppointmentNumber;
+            
+            const queueStatus = document.getElementById('queueStatus');
+            if (yourAppointmentNumber > 1) {
+                queueStatus.textContent = `There are ${yourAppointmentNumber - 1} patients ahead of you.`;
+            } else {
+                queueStatus.textContent = "You're next in line!";
+            }
+        }
+
+        function updateAppointmentsTable() {
+            const tableBody = document.getElementById('appointmentsTable');
+            tableBody.innerHTML = '';
+            appointments.forEach(appointment => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = appointment.name;
+                row.insertCell(1).textContent = appointment.date;
+                row.insertCell(2).textContent = appointment.time;
+            });
+        }
+
+        function simulateQueueChanges() {
+            setInterval(() => {
+                queueLength = Math.max(0, queueLength + Math.floor(Math.random() * 3) - 1);
+                waitTime = Math.max(0, waitTime + Math.floor(Math.random() * 10) - 5);
+                yourAppointmentNumber = Math.max(1, yourAppointmentNumber - 1);
+                updateQueueStatus();
+            }, 5000);
+        }
+
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            
+            if (name && date && time) {
+                appointments.push({ id: appointments.length + 1, name, date, time });
+                updateAppointmentsTable();
+                this.reset();
+            }
+        });
+
+        // Initialize
+        yourAppointmentNumber = Math.floor(Math.random() * 20) + 1;
+        updateQueueStatus();
+        updateAppointmentsTable();
+        simulateQueueChanges();
+    </script>
+</body>
+</html>

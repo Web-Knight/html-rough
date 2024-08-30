@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .card-subtext {
+            font-size: 12px;
+            color: #999;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .badge {
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .badge-red {
+            background-color: #dc3545;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hospital Management Dashboard</h1>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title">Total Patients</div>
+                    <div class="card-value">1,234</div>
+                    <div class="card-subtext">+20% from last month</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Bed Occupancy</div>
+                    <div class="card-value">78%</div>
+                    <div class="card-subtext">-5% from yesterday</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Avg. Wait Time</div>
+                    <div class="card-value">32 min</div>
+                    <div class="card-subtext">+5 min from last week</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Daily Admissions</div>
+                    <div class="card-value">24</div>
+                    <div class="card-subtext">+2 from yesterday</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="card-grid">
+            <div class="card" style="grid-column: span 2;">
+                <h2>OPD Queue</h2>
+                <table id="opdQueue">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Wait Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- OPD Queue rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+                <button onclick="addToQueue()">Add to Queue</button>
+            </div>
+
+            <div class="card">
+                <h2>Patient Admission</h2>
+                <form id="admissionForm">
+                    <input type="text" placeholder="Patient Name" required>
+                    <input type="text" placeholder="Patient ID" required>
+                    <input type="text" placeholder="Department" required>
+                    <input type="date" required>
+                    <button type="submit">Admit Patient</button>
+                </form>
+            </div>
+
+            <div class="card" style="grid-column: span 3;">
+                <h2>Bed Availability</h2>
+                <table id="bedAvailability">
+                    <thead>
+                        <tr>
+                            <th>Ward</th>
+                            <th>Total Beds</th>
+                            <th>Available Beds</th>
+                            <th>Occupancy Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Bed Availability rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let opdQueue = [
+            { id: 1, name: "John Doe", department: "Cardiology", waitTime: "15 min" },
+            { id: 2, name: "Jane Smith", department: "Orthopedics", waitTime: "30 min" },
+            { id: 3, name: "Bob Johnson", department: "Neurology", waitTime: "45 min" },
+        ];
+
+        let bedAvailability = [
+            { ward: "General", total: 50, available: 10 },
+            { ward: "ICU", total: 20, available: 3 },
+            { ward: "Pediatric", total: 30, available: 8 },
+        ];
+
+        // Function to render OPD Queue
+        function renderOPDQueue() {
+            const tbody = document.querySelector('#opdQueue tbody');
+            tbody.innerHTML = '';
+            opdQueue.forEach(patient => {
+                const row = `
+                    <tr>
+                        <td>${patient.name}</td>
+                        <td>${patient.department}</td>
+                        <td>${patient.waitTime}</td>
+                        <td><button onclick="callPatient(${patient.id})">Call</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Function to render Bed Availability
+        function renderBedAvailability() {
+            const tbody = document.querySelector('#bedAvailability tbody');
+            tbody.innerHTML = '';
+            bedAvailability.forEach(ward => {
+                const occupancyRate = Math.round(((ward.total - ward.available) / ward.total) * 100);
+                const row = `
+                    <tr>
+                        <td>${ward.ward}</td>
+                        <td>${ward.total}</td>
+                        <td><span class="badge ${ward.available < 5 ? 'badge-red' : ''}">${ward.available}</span></td>
+                        <td>${occupancyRate}%</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Function to call a patient
+        function callPatient(id) {
+            opdQueue = opdQueue.filter(patient => patient.id !== id);
+            renderOPDQueue();
+        }
+
+        // Function to add a patient to the queue
+        function addToQueue() {
+            const newId = opdQueue.length > 0 ? Math.max(...opdQueue.map(p => p.id)) + 1 : 1;
+            opdQueue.push({
+                id: newId,
+                name: `Patient ${newId}`,
+                department: "General",
+                waitTime: "0 min"
+            });
+            renderOPDQueue();
+        }
+
+        // Event listener for patient admission form
+        document.getElementById('admissionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real app, you'd send this data to a backend
+            console.log("Patient admitted:", Object.fromEntries(new FormData(e.target)));
+            this.reset();
+        });
+
+        // Initial render
+        renderOPDQueue();
+        renderBedAvailability();
+    </script>
+</body>
+</html>
