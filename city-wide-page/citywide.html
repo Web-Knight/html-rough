@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Integration - Hospital Bed Availability</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .card-title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .hospital-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .hospital-item:last-child {
+            border-bottom: none;
+        }
+        .hospital-info h2 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+        }
+        .hospital-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .view-details-btn {
+            background-color: transparent;
+            border: 1px solid #333;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .view-details-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">City Integration</h1>
+        </div>
+        <div class="card-content" id="hospitalList">
+            <!-- Hospital items will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Mock data for hospitals
+        const hospitals = [
+            {
+                id: 1,
+                name: "City Hospital",
+                beds: { inpatient: 120, icu: 30, emergency: 15 }
+            },
+            {
+                id: 2,
+                name: "Regional Medical Center",
+                beds: { inpatient: 80, icu: 20, emergency: 10 }
+            },
+            {
+                id: 3,
+                name: "Community Hospital",
+                beds: { inpatient: 50, icu: 10, emergency: 5 }
+            }
+        ];
+
+        function createHospitalElement(hospital) {
+            const hospitalElement = document.createElement('div');
+            hospitalElement.className = 'hospital-item';
+            hospitalElement.innerHTML = `
+                <div class="hospital-info">
+                    <h2>${hospital.name}</h2>
+                    <p>Available Beds: ${hospital.beds.inpatient} (Inpatient), ${hospital.beds.icu} (ICU), ${hospital.beds.emergency} (Emergency)</p>
+                </div>
+                <button class="view-details-btn" onclick="viewDetails(${hospital.id})">View Details</button>
+            `;
+            return hospitalElement;
+        }
+
+        function renderHospitals() {
+            const hospitalList = document.getElementById('hospitalList');
+            hospitals.forEach(hospital => {
+                hospitalList.appendChild(createHospitalElement(hospital));
+            });
+        }
+
+        function viewDetails(hospitalId) {
+            alert(`Viewing details for hospital with ID: ${hospitalId}`);
+            // In a real application, this would navigate to a detailed view or open a modal
+        }
+
+        // Render hospitals when the page loads
+        window.onload = renderHospitals;
+    </script>
+</body>
+</html>
